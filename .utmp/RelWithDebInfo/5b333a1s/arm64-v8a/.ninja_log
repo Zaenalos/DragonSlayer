@@ -1,0 +1,23 @@
+# ninja log v5
+61	2552	7611123281143735	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	605069f427230459
+36	2507	7611123280856920	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	83e6ea629844080b
+2508	4234	7611123298407787	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	31c005038e89c367
+45	2794	7611123283925933	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	f1709493ec758d30
+83	2567	7611123281586571	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	49fd190d96671350
+2567	2968	7611123285638857	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	86b8d587ba694341
+25	3380	7611123289817220	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	43f2ca7ac364e3ef
+112	3239	7611123287252669	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	b7ae2c9eda458123
+2968	3660	7611123292243512	D:/DragonSlayer/DragonSlayer/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/5b333a1s/obj/arm64-v8a/libswappywrapper.so	fe33eda31cec35b9
+2553	4326	7611123299277126	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	132f31c7255fb24b
+4326	4491	7611123300911435	D:/DragonSlayer/DragonSlayer/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/5b333a1s/obj/arm64-v8a/libgame.so	604ce136291dd035
+38	1989	7611158249548571	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	605069f427230459
+20	2091	7611158250779289	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	83e6ea629844080b
+77	2172	7611158251848551	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	31c005038e89c367
+52	2457	7611158254686885	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	f1709493ec758d30
+2172	2555	7611158255684011	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	86b8d587ba694341
+67	2867	7611158258826789	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	b7ae2c9eda458123
+11	3046	7611158260556797	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	43f2ca7ac364e3ef
+2555	3114	7611158261296338	D:/DragonSlayer/DragonSlayer/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/5b333a1s/obj/arm64-v8a/libswappywrapper.so	fe33eda31cec35b9
+1990	3594	7611158266152061	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	49fd190d96671350
+2091	3746	7611158267641753	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	132f31c7255fb24b
+3747	3901	7611158269165751	D:/DragonSlayer/DragonSlayer/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/5b333a1s/obj/arm64-v8a/libgame.so	604ce136291dd035
