@@ -21,3 +21,5 @@
 1990	3594	7611158266152061	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	49fd190d96671350
 2091	3746	7611158267641753	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	132f31c7255fb24b
 3747	3901	7611158269165751	D:/DragonSlayer/DragonSlayer/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/5b333a1s/obj/arm64-v8a/libgame.so	604ce136291dd035
+14	458	7613324879131539	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	86b8d587ba694341
+458	868	7613324883126581	D:/DragonSlayer/DragonSlayer/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/5b333a1s/obj/arm64-v8a/libswappywrapper.so	fe33eda31cec35b9

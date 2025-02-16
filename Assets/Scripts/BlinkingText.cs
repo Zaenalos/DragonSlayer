@@ -11,31 +11,33 @@ public class BlinkingText : MonoBehaviour, IPointerClickHandler
     void Start()
     {
         textComponent = GetComponent<TextMeshProUGUI>();
+        // Ensure the text is fully visible initially.
+        SetTextAlpha(1f);
         StartCoroutine(BlinkText());
     }
 
     IEnumerator BlinkText()
     {
+        // Toggle alpha between 1 (visible) and 0 (invisible) every 0.5 seconds.
         while (true)
         {
-            textComponent.enabled = !textComponent.enabled; // Toggle visibility
+            float currentAlpha = textComponent.color.a;
+            float targetAlpha = (currentAlpha == 1f) ? 0f : 1f;
+            SetTextAlpha(targetAlpha);
             yield return new WaitForSeconds(0.5f);
         }
     }
 
-    // Detects when the text is clicked/tapped
-    public void OnPointerClick(PointerEventData eventData)
+    void SetTextAlpha(float alpha)
     {
-        UnloadMainMenu();
+        Color color = textComponent.color;
+        color.a = alpha;
+        textComponent.color = color;
     }
 
-    void UnloadMainMenu()
+    void IPointerClickHandler.OnPointerClick(PointerEventData eventData)
     {
-        string menuSceneName = "Main Menu Scene"; // Change this to match your main menu scene name
-        SceneManager.LoadScene("Tutorial Scene");
-        if (SceneManager.GetSceneByName(menuSceneName).isLoaded)
-        {
-            SceneManager.UnloadSceneAsync(menuSceneName);
-        }
+        // Load the next scene when the text is clicked.
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 }
