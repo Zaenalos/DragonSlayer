@@ -4,22 +4,24 @@ using UnityEngine.EventSystems;
 using System.Collections;
 using UnityEngine.InputSystem;  // Required for the new Input System
 
-[RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(Rigidbody2D))]
-[RequireComponent(typeof(SpriteRenderer))]
+[RequireComponent(typeof(Animator), typeof(Rigidbody2D), typeof(SpriteRenderer))]
 public class HeroKnight : MonoBehaviour
 {
-    // Generated Input Action class instance.
+    // Input and audio.
     private InputSystem controls;
     private AudioSource audioSource;
-    public HealthBar healthBar;
 
     #region Serialized Fields
 
+    [Header("UI Elements")]
+    [SerializeField] private HealthBar healthBar;
+
     [Header("Player Attributes")]
-    [SerializeField] private int health = 100;
+    [SerializeField] public int health = 0;
     [SerializeField] private int maxHealth = 100;
-    [SerializeField] private int playerDamage = 10;
+    [SerializeField] private int playerDamage = 35;
+    [SerializeField] private int playerAttackRange = 1;
+    [SerializeField] public bool isDead = false;
 
     [Header("Movement Settings")]
     [SerializeField] private float speed = 4.0f;
@@ -32,14 +34,13 @@ public class HeroKnight : MonoBehaviour
 
     [Header("Sensors")]
     [SerializeField] private Sensor_HeroKnight groundSensor;
+    [SerializeField] private Transform attackPoint;
 
     [Header("UI Buttons")]
     public Button attackButton;
     public Button jumpButton;
     public Button rollButton;
     public Button blockButton;
-
-    // Movement buttons for touch input.
     public Button moveLeftButton;
     public Button moveRightButton;
 
@@ -62,12 +63,11 @@ public class HeroKnight : MonoBehaviour
     private float currentIdleDelay = idleDelay;
 
     // Block button parameters.
-    private const float blockHoldThreshold = 0.1f; // Seconds required to register as a hold.
-    private bool blockButtonIsHeld = false;
-    private float blockButtonPressTime = 0f;
-    private bool isCheckingBlockHold = false;
-    // Flag to track if block hold began while in mid-air.
-    private bool blockHoldStartedInAir = false;
+    private const float blockHoldThreshold = 0.1f;
+    private bool blockButtonIsHeld;
+    private float blockButtonPressTime;
+    private bool isCheckingBlockHold;
+    private bool blockHoldStartedInAir;
 
     #endregion
 
@@ -75,39 +75,28 @@ public class HeroKnight : MonoBehaviour
 
     private void Awake()
     {
+        // Initialize components and input system.
+        healthBar = FindFirstObjectByType<HealthBar>();
         health = maxHealth;
-        healthBar.SetMaxHealth(maxHealth);
         controls = new InputSystem();
         audioSource = GetComponent<AudioSource>();
-
-        // Subscribe to Input System actions.
-        controls.Player.Move.performed += ctx => moveInput = ctx.ReadValue<float>();
-        controls.Player.Move.canceled += ctx => moveInput = 0f;
-        controls.Player.Jump.performed += ctx => Jump();
-        controls.Player.Attack.performed += ctx => ProcessAttack();
-        controls.Player.Block.started += ctx => OnBlockStarted();
-        controls.Player.Block.canceled += ctx => OnBlockCanceled();
-        controls.Player.Roll.performed += ctx => StartRoll();
 
         animator = GetComponent<Animator>();
         body2d = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
+        SetupInputCallbacks();
+        SetupUIButtons();
+
+        // Set up ground sensor if not assigned.
         if (groundSensor == null)
             groundSensor = transform.Find("GroundSensor")?.GetComponent<Sensor_HeroKnight>();
+    }
 
-        // Assign UI button listeners.
-        if (attackButton) attackButton.onClick.AddListener(ProcessAttack);
-        if (jumpButton) jumpButton.onClick.AddListener(Jump);
-        if (rollButton) rollButton.onClick.AddListener(StartRoll);
-
-        if (blockButton != null)
-            SetupBlockButton(blockButton);
-
-        if (moveLeftButton != null)
-            SetupMovementButton(moveLeftButton, -1f);
-        if (moveRightButton != null)
-            SetupMovementButton(moveRightButton, 1f);
+    private void Start()
+    {
+        healthBar.SetMaxHealth(maxHealth);
+        healthBar.SetHealth(health);
     }
 
     private void OnEnable() => controls.Enable();
@@ -115,12 +104,11 @@ public class HeroKnight : MonoBehaviour
 
     private void FixedUpdate()
     {
+        Die();
         HandleTimers();
 
-        // If a roll just ended and the block button is still held—with the hold duration met—trigger block.
-        if (!rolling && blockButtonIsHeld && grounded &&
-            (Time.time - blockButtonPressTime >= blockHoldThreshold) &&
-            !animator.GetBool("IdleBlock"))
+        if (!rolling && blockButtonIsHeld && grounded && (Time.time - blockButtonPressTime >= blockHoldThreshold)
+            && !animator.GetBool("IdleBlock"))
         {
             animator.SetBool("IdleBlock", true);
             moveInput = 0f;
@@ -130,7 +118,38 @@ public class HeroKnight : MonoBehaviour
         UpdateGroundStatus();
         HandleTouchMovement();
     }
+    #endregion
 
+    //void OnCollisionEnter2D(Collision2D collision)
+    //{
+    //    if (collision.gameObject.CompareTag("Enemy")) // Ignore the collision with the enemies.
+    //    {
+    //        Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
+    //    }
+    //}
+
+    #region Input & UI Setup
+
+    private void SetupInputCallbacks()
+    {
+        controls.Player.Move.performed += ctx => moveInput = ctx.ReadValue<float>();
+        controls.Player.Move.canceled += ctx => moveInput = 0f;
+        controls.Player.Jump.performed += ctx => Jump();
+        controls.Player.Attack.performed += ctx => ProcessAttack();
+        controls.Player.Block.started += ctx => OnBlockStarted();
+        controls.Player.Block.canceled += ctx => OnBlockCanceled();
+        controls.Player.Roll.performed += ctx => StartRoll();
+    }
+
+    private void SetupUIButtons()
+    {
+        if (attackButton) attackButton.onClick.AddListener(ProcessAttack);
+        if (jumpButton) jumpButton.onClick.AddListener(Jump);
+        if (rollButton) rollButton.onClick.AddListener(StartRoll);
+        if (blockButton) SetupBlockButton(blockButton);
+        if (moveLeftButton) SetupMovementButton(moveLeftButton, -1f);
+        if (moveRightButton) SetupMovementButton(moveRightButton, 1f);
+    }
     #endregion
 
     #region Update Helpers
@@ -150,6 +169,36 @@ public class HeroKnight : MonoBehaviour
         }
     }
 
+    public void TakeDamage(int receivedDamage, int enemyDirection)
+    {
+        if (animator.GetBool("IdleBlock") && enemyDirection != facingDirection)
+            return;
+        animator.SetTrigger("Hurt");
+        health -= receivedDamage;
+        healthBar.SetHealth(health);
+    }
+
+    public void DealDamage()
+    {
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, playerAttackRange);
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            if (enemy.CompareTag("Enemy"))
+                enemy.GetComponent<EnemyNPC>().TakeDamage(playerDamage);
+        }
+    }
+
+    private void Die()
+    {
+        if (isDead) return;
+        if (health <= 0)
+        {
+            isDead = true;
+            animator.SetTrigger("Death");
+            Destroy(gameObject, 2f);
+        }
+    }
+
     private void UpdateGroundStatus()
     {
         bool sensorGrounded = groundSensor != null && groundSensor.State();
@@ -158,7 +207,6 @@ public class HeroKnight : MonoBehaviour
             grounded = sensorGrounded;
             animator.SetBool("Grounded", grounded);
 
-            // When landing with block already held:
             if (grounded && blockButtonIsHeld)
             {
                 if (blockHoldStartedInAir && !rolling && !animator.GetBool("IdleBlock"))
@@ -178,7 +226,6 @@ public class HeroKnight : MonoBehaviour
 
     private void HandleTouchMovement()
     {
-        // When in idle block state on the ground, allow flipping but disable horizontal movement.
         if (animator.GetBool("IdleBlock") && grounded && !rolling)
         {
             if (Mathf.Abs(moveInput) > 0.1f)
@@ -190,7 +237,6 @@ public class HeroKnight : MonoBehaviour
             return;
         }
 
-        // Normal movement.
         body2d.linearVelocity = new Vector2(moveInput * speed, body2d.linearVelocity.y);
         animator.SetFloat("AirSpeedY", body2d.linearVelocity.y);
 
@@ -209,15 +255,7 @@ public class HeroKnight : MonoBehaviour
         }
     }
 
-    // Called by movement UI button events.
-    public void SetMovementInput(float input)
-    {
-        moveInput = input;
-    }
-
-    #endregion
-
-    #region Input Handlers
+    public void SetMovementInput(float input) => moveInput = input;
 
     private void ProcessAttack()
     {
@@ -225,6 +263,7 @@ public class HeroKnight : MonoBehaviour
         {
             currentAttack = (currentAttack >= 3 || timeSinceAttack > 1.0f) ? 1 : currentAttack + 1;
             animator.SetTrigger("Attack" + currentAttack);
+            DealDamage();
             audioSource.Play();
             timeSinceAttack = 0f;
         }
@@ -249,11 +288,9 @@ public class HeroKnight : MonoBehaviour
             grounded = false;
             animator.SetBool("Grounded", false);
             body2d.linearVelocity = new Vector2(body2d.linearVelocity.x, jumpForce);
-            groundSensor?.Disable(0.2f);
         }
     }
 
-    // Common block start handler for both Input System and UI.
     private void OnBlockStarted()
     {
         blockButtonIsHeld = true;
@@ -261,12 +298,11 @@ public class HeroKnight : MonoBehaviour
         if (!grounded)
             blockHoldStartedInAir = true;
 
-        // Immediately cancel movement and enter block mode if grounded and not rolling.
         if (grounded && !rolling)
         {
             moveInput = 0f;
             body2d.linearVelocity = new Vector2(0f, body2d.linearVelocity.y);
-            animator.SetBool("IdleBlock", true);
+            animator.SetBool("Block", true);
             animator.SetInteger("AnimState", 0);
         }
 
@@ -274,7 +310,6 @@ public class HeroKnight : MonoBehaviour
             StartCoroutine(CheckBlockHold());
     }
 
-    // Common block cancel handler for both Input System and UI.
     private void OnBlockCanceled()
     {
         blockButtonIsHeld = false;
@@ -285,6 +320,18 @@ public class HeroKnight : MonoBehaviour
         animator.SetBool("IdleBlock", false);
     }
 
+    private IEnumerator CheckBlockHold()
+    {
+        isCheckingBlockHold = true;
+        yield return new WaitForSeconds(blockHoldThreshold);
+        if (blockButtonIsHeld && grounded && !rolling && !animator.GetBool("IdleBlock"))
+        {
+            animator.SetBool("IdleBlock", true);
+            moveInput = 0f;
+            body2d.linearVelocity = new Vector2(0f, body2d.linearVelocity.y);
+        }
+        isCheckingBlockHold = false;
+    }
     #endregion
 
     #region Movement & Block Button Setup
@@ -304,35 +351,27 @@ public class HeroKnight : MonoBehaviour
 
     private void SetupBlockButton(Button button)
     {
-        // Remove any existing onClick listeners.
         button.onClick.RemoveAllListeners();
-
         EventTrigger trigger = button.GetComponent<EventTrigger>() ?? button.gameObject.AddComponent<EventTrigger>();
 
-        // Use the common OnBlockStarted for pointer down.
         var pointerDownEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerDown };
         pointerDownEntry.callback.AddListener((data) => OnBlockStarted());
         trigger.triggers.Add(pointerDownEntry);
 
-        // Use the common OnBlockCanceled for pointer up.
         var pointerUpEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
         pointerUpEntry.callback.AddListener((data) => OnBlockCanceled());
         trigger.triggers.Add(pointerUpEntry);
     }
+    #endregion
 
-    // Optimized CheckBlockHold coroutine using WaitForSeconds.
-    private IEnumerator CheckBlockHold()
+    #region Gizmos
+
+    private void OnDrawGizmosSelected()
     {
-        isCheckingBlockHold = true;
-        yield return new WaitForSeconds(blockHoldThreshold);
-        if (blockButtonIsHeld && grounded && !rolling && !animator.GetBool("IdleBlock"))
-        {
-            animator.SetBool("IdleBlock", true);
-            moveInput = 0f;
-            body2d.linearVelocity = new Vector2(0f, body2d.linearVelocity.y);
-        }
-        isCheckingBlockHold = false;
+#if UNITY_EDITOR
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(attackPoint ? attackPoint.position : transform.position, playerAttackRange);
+#endif
     }
-
     #endregion
 }

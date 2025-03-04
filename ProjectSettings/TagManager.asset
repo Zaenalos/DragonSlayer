@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 3
   tags:
   - Ground
+  - Enemy
+  - HeroAttack
+  - Ladder
   layers:
   - Default
   - TransparentFX
@@ -13,8 +16,8 @@ TagManager:
   - Water
   - UI
   - Player
-  - 
-  - 
+  - NPC
+  - Interactable
   - 
   - 
   - 
@@ -39,17 +42,26 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Background
-    uniqueID: 1170963541
-    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Foreground
+  - name: Background Details
+    uniqueID: 1170963541
+    locked: 0
+  - name: Ground & Platforms
+    uniqueID: 2614675221
+    locked: 0
+  - name: Foreground Details
+    uniqueID: 2878796483
+    locked: 0
+  - name: Obstacles
+    uniqueID: 2978291737
+    locked: 0
+  - name: Player & NPCs
     uniqueID: 1323570195
     locked: 0
-  - name: Player
-    uniqueID: 2878796483
+  - name: Gui
+    uniqueID: 1225708043
     locked: 0
   m_RenderingLayers:
   - Default

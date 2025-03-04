@@ -1,41 +1,19 @@
 ﻿using UnityEngine;
-using System.Collections;
+public class Sensor_HeroKnight : MonoBehaviour
+{
+    [SerializeField] private string groundTag = "Ground"; // Set the tag for ground objects. private bool isGrounded;
+    [SerializeField] private bool isGrounded = false;
+    public bool State() => isGrounded;
 
-public class Sensor_HeroKnight : MonoBehaviour {
-
-    private int m_ColCount = 0;
-
-    private float m_DisableTimer;
-
-    private void OnEnable()
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        m_ColCount = 0;
+        if (other.CompareTag(groundTag))
+            isGrounded = true;
     }
 
-    public bool State()
+    private void OnTriggerExit2D(Collider2D other)
     {
-        if (m_DisableTimer > 0)
-            return false;
-        return m_ColCount > 0;
-    }
-
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        m_ColCount++;
-    }
-
-    void OnTriggerExit2D(Collider2D other)
-    {
-        m_ColCount--;
-    }
-
-    void Update()
-    {
-        m_DisableTimer -= Time.deltaTime;
-    }
-
-    public void Disable(float duration)
-    {
-        m_DisableTimer = duration;
+        if (other.CompareTag(groundTag))
+            isGrounded = false;
     }
 }
