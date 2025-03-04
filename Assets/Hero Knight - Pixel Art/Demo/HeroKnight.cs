@@ -150,6 +150,17 @@ public class HeroKnight : MonoBehaviour
         if (moveLeftButton) SetupMovementButton(moveLeftButton, -1f);
         if (moveRightButton) SetupMovementButton(moveRightButton, 1f);
     }
+
+    private void ToggleButtons(bool state)
+    {
+        if (attackButton) attackButton.interactable = state;
+        if (jumpButton) jumpButton.interactable = state;
+        if (rollButton) rollButton.interactable = state;
+        if (blockButton) blockButton.interactable = state;
+        if (moveLeftButton) moveLeftButton.interactable = state;
+        if (moveRightButton) moveRightButton.interactable = state;
+    }
+
     #endregion
 
     #region Update Helpers
@@ -167,6 +178,12 @@ public class HeroKnight : MonoBehaviour
                 rollCurrentTime = 0f;
             }
         }
+    }
+
+    public void ResetHealth()
+    {
+        health = maxHealth;
+        healthBar.SetHealth(health);
     }
 
     public void TakeDamage(int receivedDamage, int enemyDirection)
@@ -188,15 +205,39 @@ public class HeroKnight : MonoBehaviour
         }
     }
 
-    private void Die()
+    public void Die()
     {
         if (isDead) return;
         if (health <= 0)
         {
             isDead = true;
+
+            // Disable player controls
+            controls.Disable();
+
+            // Stop movement
+            body2d.linearVelocity = Vector2.zero;
+
+            // Disable UI Buttons
+            ToggleButtons(false);
+
+            // Play death animation
             animator.SetTrigger("Death");
-            Destroy(gameObject, 2f);
         }
+    }
+
+    public void OnDeathAnim() // Called by Animation Event
+    {
+        GetComponent<RespawnLogic>().Respawn();
+        animator.SetBool("Block", true);
+
+        isDead = false;
+
+        // Re-enable controls
+        controls.Enable();
+
+        // Enable UI Buttons
+        ToggleButtons(true);
     }
 
     private void UpdateGroundStatus()

@@ -22,6 +22,8 @@ public class RespawnLogic : MonoBehaviour
     public void Respawn()
     {
         // Get HeroKnight's position and set it to the spawnPoint
+        // Reset the player's health also to 100
+        playerObject.GetComponent<HeroKnight>().ResetHealth();
         playerObject.transform.position = new Vector3(spawnPoint.x, spawnPoint.y, playerObject.transform.position.z);
     }
 }
