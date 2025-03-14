@@ -315,7 +315,7 @@ public class EnemyNPC : MonoBehaviour
 
     private void Die()
     {
-        //rb2d.linearVelocity = Vector2.zero;
+        rb2d.linearVelocity = Vector2.zero;
         animator.SetTrigger(DeathTrigger);
         onDeath?.Invoke();
         //rb2d.simulated = false;

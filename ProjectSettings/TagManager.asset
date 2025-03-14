@@ -8,6 +8,8 @@ TagManager:
   - Enemy
   - HeroAttack
   - Ladder
+  - EnemyAnimal
+  - EnemyBoss
   layers:
   - Default
   - TransparentFX

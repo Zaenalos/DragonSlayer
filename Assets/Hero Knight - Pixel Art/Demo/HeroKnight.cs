@@ -186,6 +186,13 @@ public class HeroKnight : MonoBehaviour
         healthBar.SetHealth(health);
     }
 
+    public void DieTrap()
+    {
+        health = 0;
+        healthBar.SetHealth(health);
+        Die();
+    }
+
     public void TakeDamage(int receivedDamage, int enemyDirection)
     {
         if (animator.GetBool("IdleBlock") && enemyDirection != facingDirection)
@@ -202,6 +209,10 @@ public class HeroKnight : MonoBehaviour
         {
             if (enemy.CompareTag("Enemy"))
                 enemy.GetComponent<EnemyNPC>().TakeDamage(playerDamage);
+            if (enemy.CompareTag("EnemyAnimal"))
+                enemy.GetComponent<AnimalEnemyNPC>().TakeDamage(playerDamage);
+            if (enemy.CompareTag("EnemyBoss"))
+                enemy.GetComponent<DragonBoss>().TakeDamage(playerDamage);
         }
     }
 
@@ -212,14 +223,17 @@ public class HeroKnight : MonoBehaviour
         {
             isDead = true;
 
-            // Disable player controls
-            controls.Disable();
-
             // Stop movement
+            moveInput = 0f;
             body2d.linearVelocity = Vector2.zero;
+
+            // If the UI any of the UI button is held, release i
 
             // Disable UI Buttons
             ToggleButtons(false);
+
+            // Disable player controls
+            controls.Disable();
 
             // Play death animation
             animator.SetTrigger("Death");
