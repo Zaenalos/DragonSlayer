@@ -172,7 +172,7 @@ MeshRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1323570195
-  m_SortingLayer: 1
+  m_SortingLayer: 5
   m_SortingOrder: 3
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &7308588852249292745
@@ -195,7 +195,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Welcome Adventurer! Familiarize yourself with the buttons!
+  m_text: 'all '
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e4519d156e31d844a90d2bb4e3ea229e, type: 2}
   m_sharedMaterial: {fileID: 790080350291687433, guid: e4519d156e31d844a90d2bb4e3ea229e, type: 2}
@@ -349,7 +349,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1323570195
-  m_SortingLayer: 1
+  m_SortingLayer: 5
   m_SortingOrder: 2
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -450,7 +450,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1323570195
-  m_SortingLayer: 1
+  m_SortingLayer: 5
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 1ae95a805e60dd840b2959a7dc8c1e79, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
